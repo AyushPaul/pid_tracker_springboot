@@ -1,5 +1,6 @@
 package com.ayush.pidtracker;
 
+import com.ayush.pidtracker.entity.ImageData;
 import com.ayush.pidtracker.service.StorageService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
@@ -14,6 +15,7 @@ import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 import java.io.IOException;
+import java.util.List;
 
 @SpringBootApplication
 @RestController
@@ -41,6 +43,13 @@ public class PidtrackerApplication {
 				.contentType(MediaType.valueOf("image/png"))
 				.body(imageData);
 
+	}
+
+	@GetMapping("/allFiles")
+	public List<ImageData> getAllFiles(){
+		List<ImageData> files = service.getAllFiles();
+		return files;
+		//return ResponseEntity.status(HttpStatus.OK).body(files);
 	}
 
 	@Bean

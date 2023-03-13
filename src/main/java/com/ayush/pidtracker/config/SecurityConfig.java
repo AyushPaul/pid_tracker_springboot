@@ -1,5 +1,6 @@
 package com.ayush.pidtracker.config;
 
+import com.ayush.pidtracker.filter.JwtAuthFilter;
 import com.ayush.pidtracker.service.UserInfoUserDetailsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -23,6 +24,8 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @EnableMethodSecurity
 public class SecurityConfig {
 
+    @Autowired
+    private JwtAuthFilter authFilter;
     @Bean
     //authentication
     public UserDetailsService userDetailsService() {
@@ -42,13 +45,16 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         return http.csrf().disable()
                 .authorizeHttpRequests()
-                .requestMatchers("/image/**","/user/**").permitAll()
-//                .and()
-//                .authorizeHttpRequests().requestMatchers("/products/**")
-//                .authenticated()
-                .and().
-                formLogin()
+                .requestMatchers("/user/**").permitAll()
                 .and()
+                .authorizeHttpRequests().requestMatchers("/image/**")
+                .authenticated()
+                .and()
+                .sessionManagement()
+                .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+                .and()
+                .authenticationProvider(authenticationProvider())
+                .addFilterBefore(authFilter, UsernamePasswordAuthenticationFilter.class)
                 .build();
     }
 

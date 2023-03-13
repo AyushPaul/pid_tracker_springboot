@@ -10,6 +10,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
+import java.util.zip.DataFormatException;
 
 @Service
 public class StorageService {
@@ -17,22 +18,24 @@ public class StorageService {
     @Autowired
     private StorageRepository repository;
 
-    public String uploadImage(MultipartFile file) throws IOException {
+    public String uploadImage(MultipartFile file, String comment , String pass, String Id) throws IOException {
 
         ImageData imageData = repository.save(ImageData.builder()
                 .name(file.getOriginalFilename())
                 .type(file.getContentType())
-                .imageData(ImageUtils.compressImage(file.getBytes())).build());
+                .comment(comment)
+                .user_id(Id)
+                .imageData(ImageUtils.compress(file.getBytes())).build());
         if (imageData != null) {
-            return "file uploaded successfully : " + file.getOriginalFilename();
+            return "file uploaded successfully : " + file.getOriginalFilename() + " by User Id : " + Id;
         }
         return null;
     }
 
-    public byte[] downloadImage(String fileName){
+    public byte[] downloadImage(String fileName) throws DataFormatException, IOException {
         Optional<ImageData> dbImageData = repository.findByName(fileName);
 
-        byte[] images= ImageUtils.decompressImage(dbImageData.get().getImageData());
+        byte[] images= ImageUtils.decompress(dbImageData.get().getImageData());
         return images;
     }
 

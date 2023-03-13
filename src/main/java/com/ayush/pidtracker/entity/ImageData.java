@@ -22,6 +22,12 @@ public class ImageData {
     private String name;
     private String type;
     @Lob
-    @Column(name = "imagedata",length = 1000)
+    @Column(name = "imagedata",length = 3000)
     private byte[] imageData;
+
+    private String comment;
+
+    private String user_id;
+
+    private String reviewer_id;
 }

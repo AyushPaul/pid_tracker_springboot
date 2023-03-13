@@ -1,7 +1,9 @@
 package com.ayush.pidtracker;
 
 import com.ayush.pidtracker.entity.ImageData;
+import com.ayush.pidtracker.service.JwtService;
 import com.ayush.pidtracker.service.StorageService;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -20,6 +22,7 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
+import java.util.zip.DataFormatException;
 
 @SpringBootApplication
 @RestController
@@ -30,17 +33,24 @@ public class PidtrackerApplication {
 	@Autowired
 	private StorageService service;
 
+	@Autowired
+	private JwtService jwtService;
+
 	@PostMapping
-	public ResponseEntity<?> uploadImage(@RequestParam("file") MultipartFile file) throws IOException {
+	public ResponseEntity<?> uploadImage(@RequestParam("file") MultipartFile file , @RequestParam("comment") String comment, @RequestParam("pass") String pass, @RequestParam("token") String token) throws IOException {
 //		System.console().printf(file.getOriginalFilename());
 //		System.console().printf(file.getContentType());
-		String uploadImage = service.uploadImage(file);
+		//String authHeader = request.getHeader("Authorization");
+		//String token = authHeader.substring(7);
+		String username = jwtService.extractUsername(token);
+		String id = jwtService.extractId(token);
+		String uploadImage = service.uploadImage(file,comment,pass,username);
 		return ResponseEntity.status(HttpStatus.OK)
 				.body(uploadImage);
 	}
 
 	@GetMapping("/{fileName}")
-	public ResponseEntity<?> downloadImage(@PathVariable String fileName){
+	public ResponseEntity<?> downloadImage(@PathVariable String fileName) throws DataFormatException, IOException {
 		byte[] imageData=service.downloadImage(fileName);
 		//System.console().printf(fileName);
 		return ResponseEntity.status(HttpStatus.OK)

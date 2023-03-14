@@ -25,9 +25,26 @@ public class StorageService {
                 .type(file.getContentType())
                 .comment(comment)
                 .user_id(Id)
+                .reviewed(false)
                 .imageData(ImageUtils.compress(file.getBytes())).build());
         if (imageData != null) {
             return "file uploaded successfully : " + file.getOriginalFilename() + " by User Id : " + Id;
+        }
+        return null;
+    }
+
+    public String uploadImage2(MultipartFile file, String comment , String reviewer, String user) throws IOException {
+
+        ImageData imageData = repository.save(ImageData.builder()
+                .name(file.getOriginalFilename())
+                .type(file.getContentType())
+                .comment(comment)
+                .user_id(user)
+                .reviewer_id(reviewer)
+                .reviewed(false)
+                .imageData(ImageUtils.compress(file.getBytes())).build());
+        if (imageData != null) {
+            return "file uploaded successfully : " + file.getOriginalFilename() + " by User Id : " + user;
         }
         return null;
     }

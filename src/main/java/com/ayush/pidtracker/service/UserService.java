@@ -18,6 +18,7 @@ public class UserService {
 
     public String addUser(UserInfo userInfo){
         userInfo.setPassword(passwordEncoder.encode(userInfo.getPassword()));
+        userInfo.setCurrently_reviewing(false);
         repository.save(userInfo);
         return "user added to system ";
     }
@@ -25,5 +26,19 @@ public class UserService {
     public Optional<UserInfo> findUserById(Integer Id){
         Optional<UserInfo> userInfo = repository.findUserById(Id);
         return userInfo;
+    }
+    public Optional<UserInfo> findUserByName(String name){
+        Optional<UserInfo> userInfo = repository.findUserByName(name);
+        return userInfo;
+    }
+
+    public Optional<UserInfo> getUserByStatus(Boolean Status , String name){
+        Optional<UserInfo> userInfo = repository.getUserByStatus(Status,name);
+        return userInfo;
+    }
+
+    public int changeUserStatus(String name , Boolean Status){
+        int success = repository.changeUserStatus(name,Status);
+        return success;
     }
 }

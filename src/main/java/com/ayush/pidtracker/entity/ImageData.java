@@ -30,4 +30,7 @@ public class ImageData {
     private String user_id;
 
     private String reviewer_id;
+
+    @Column(columnDefinition = "boolean default false")
+    private Boolean reviewed;
 }

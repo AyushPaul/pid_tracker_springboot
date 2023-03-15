@@ -60,5 +60,9 @@ public class StorageService {
         List<ImageData> files = repository.findAll();
         return files;
     }
+
+    public List<ImageData> findFilesForDev(String name , Boolean status){
+        return repository.findFilesForDev(name,status);
+    }
 }
 

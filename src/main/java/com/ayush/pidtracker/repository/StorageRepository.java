@@ -16,7 +16,9 @@ public interface StorageRepository extends JpaRepository<ImageData,Long> {
     Optional<ImageData> findByName(String fileName);
 
     @Query("SELECT img from ImageData img WHERE img.user_id = ?1 AND img.reviewed = ?2")
-    List<ImageData> findFilesForDev(String id , Boolean status);
+    List<ImageData> findFilesForDev(String name , Boolean status);
+
+
 
 
 

@@ -19,8 +19,8 @@ import java.util.logging.LogManager;
 import java.util.logging.Logger;
 
 @RestController
-@RequestMapping("/dev")
-public class DevController {
+@RequestMapping("/rev")
+public class RevController {
     @Autowired
     private UserService userService;
     @Autowired
@@ -28,55 +28,18 @@ public class DevController {
     @Autowired
     private StorageService storageService;
 
-    @PostMapping("/uploadfile")
-    public Map<String, Object> uploadNewFile(@RequestParam("file") MultipartFile file , @RequestParam("comment") String comment, @RequestParam("pass") String pass, @RequestParam("token") String token, @RequestHeader("Authorization") String authHeader) throws IOException {
-        LogManager logManager = LogManager.getLogManager();
-        Logger logger = logManager.getLogger(Logger.GLOBAL_LOGGER_NAME);
+    @GetMapping("/pending")
+    public List<ImageData> getPendingFiles(@RequestHeader("Authorization") String authHeader){
         Map<String, Object> map = new HashMap<String, Object>();
         String token2 = authHeader.substring(7);
         if(token2 == null)
         {
             map.put("success" , false);
             map.put("message","Error Fetching User");
-            return map;
+            return null;
         }
         String username = jwtService.extractUsername(token2);
-        Optional<UserInfo> sender = userService.findUserByName(username);
-        Optional<UserInfo> reviewer = userService.getUserByStatus(false,sender.get().getName());
-        if(reviewer.isEmpty())
-        {
-
-            reviewer = userService.getUserByStatus(true,sender.get().getName());
-            logger.log(Level.INFO,reviewer.get().getName());
-            if(reviewer == null)
-            {
-                map.put("success" , false);
-                map.put("message","Error Finding Reviewer");
-                return map;
-            }
-        }
-        logger.log(Level.INFO,reviewer.get().getName());
-        int success = userService.changeUserStatus(reviewer.get().getName(),true);
-
-        if(success <= 0)
-        {
-            map.put("success" , false);
-            map.put("message","Error Changing User Status.");
-            return map;
-        }
-
-        String fileUpload = storageService.uploadImage2(file,comment,reviewer.get().getName(),sender.get().getName());
-        logger.log(Level.INFO,fileUpload);
-        if(fileUpload == null) {
-            map.put("success", false);
-            map.put("message", "Error Uploading File.");
-            return map;
-        }
-
-        map.put("success" , true);
-        map.put("message",fileUpload);
-
-        return map;
+        return storageService.findFilesForRev(username,false);
     }
 
     @GetMapping("/approved")
@@ -90,25 +53,11 @@ public class DevController {
             return null;
         }
         String username = jwtService.extractUsername(token2);
-        return storageService.findFilesForDev(username,true);
+        return storageService.findFilesForRev(username,true);
     }
 
-    @GetMapping("/pending")
-    public List<ImageData> getPendingFiles(@RequestHeader("Authorization") String authHeader){
-        Map<String, Object> map = new HashMap<String, Object>();
-        String token2 = authHeader.substring(7);
-        if(token2 == null)
-        {
-            map.put("success" , false);
-            map.put("message","Error Fetching User");
-            return null;
-        }
-        String username = jwtService.extractUsername(token2);
-        return storageService.findFilesForDev(username,false);
-    }
-
-    @PostMapping("/uploadfilerev")
-    public Map<String, Object> uploadFileRev(@RequestParam("file") MultipartFile file , @RequestParam("comment") String comment, @RequestParam("pass") String pass, @RequestParam("fileName") String fileName, @RequestHeader("Authorization") String authHeader) throws IOException {
+    @PostMapping("/uploadfile")
+    public Map<String, Object> uploadNewFile(@RequestParam("file") MultipartFile file , @RequestParam("comment") String comment, @RequestParam("pass") String pass, @RequestParam("fileName") String fileName, @RequestHeader("Authorization") String authHeader) throws IOException {
         LogManager logManager = LogManager.getLogManager();
         Logger logger = logManager.getLogger(Logger.GLOBAL_LOGGER_NAME);
         Map<String, Object> map = new HashMap<String, Object>();
@@ -120,9 +69,9 @@ public class DevController {
             return map;
         }
         String username = jwtService.extractUsername(token2);
-        Optional<UserInfo> dev = userService.findUserByName(username);
+        Optional<UserInfo> reviewer = userService.findUserByName(username);
         Optional<ImageData> prev_file = storageService.findFileByName(fileName);
-        Optional<UserInfo> reviewer = userService.findUserByName(prev_file.get().getUser_id());
+        Optional<UserInfo> dev = userService.findUserByName(prev_file.get().getUser_id());
         if(reviewer.isEmpty())
         {
             map.put("success" , false);
@@ -142,8 +91,8 @@ public class DevController {
             return map;
         }
 
-
-        int userStatusChange = userService.changeUserStatus(reviewer.get().getName(),true);
+        // Need to write a method which checks if the reviewere has some files pending before setting currently_reviewing status to false
+        int userStatusChange = userService.changeUserStatus(username,false);
         //logger.log(Level.INFO,reviewer.get().getName());
         //int success = userService.changeUserStatus(reviewer.get().getName(),true);
 
@@ -173,4 +122,8 @@ public class DevController {
 
         return map;
     }
+
+
+
+
 }

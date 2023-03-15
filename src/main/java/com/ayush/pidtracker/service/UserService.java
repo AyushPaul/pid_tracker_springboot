@@ -41,4 +41,6 @@ public class UserService {
         int success = repository.changeUserStatus(name,Status);
         return success;
     }
+
+
 }

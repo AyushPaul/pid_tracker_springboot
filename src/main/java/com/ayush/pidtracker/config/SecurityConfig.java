@@ -47,7 +47,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests()
                 .requestMatchers("/user/**").permitAll()
                 .and()
-                .authorizeHttpRequests().requestMatchers("/image/**","/dev/**")
+                .authorizeHttpRequests().requestMatchers("/image/**","/dev/**","/rev/**")
                 .authenticated()
                 .and()
                 .sessionManagement()

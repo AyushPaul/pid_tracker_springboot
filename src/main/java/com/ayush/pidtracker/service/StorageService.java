@@ -64,5 +64,17 @@ public class StorageService {
     public List<ImageData> findFilesForDev(String name , Boolean status){
         return repository.findFilesForDev(name,status);
     }
+
+    public List<ImageData> findFilesForRev(String name , Boolean status){
+        return repository.findFilesForRev(name,status);
+    }
+
+    public Optional<ImageData>findFileByName(String name){
+        return repository.findByName(name);
+    }
+
+    public int deleteFileByName(String name){
+        return repository.deleteFileByName(name);
+    }
 }
 

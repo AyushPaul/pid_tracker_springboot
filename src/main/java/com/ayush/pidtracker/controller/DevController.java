@@ -33,7 +33,7 @@ public class DevController {
     private StorageService storageService;
 
     @PostMapping("/uploadfile")
-    public Map<String, Object> uploadNewFile(@RequestParam("file") MultipartFile file , @RequestParam("comment") String comment, @RequestParam("pass") String pass, @RequestParam("token") String token, @RequestHeader("Authorization") String authHeader) throws IOException {
+    public Map<String, Object> uploadNewFile(@RequestParam("file") MultipartFile file , @RequestParam("comment") String comment, @RequestParam("pass") String pass, @RequestHeader("Authorization") String authHeader) throws IOException {
         LogManager logManager = LogManager.getLogManager();
         Logger logger = logManager.getLogger(Logger.GLOBAL_LOGGER_NAME);
         Map<String, Object> map = new HashMap<String, Object>();

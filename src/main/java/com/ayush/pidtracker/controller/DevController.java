@@ -6,20 +6,24 @@ import com.ayush.pidtracker.service.JwtService;
 import com.ayush.pidtracker.service.StorageService;
 import com.ayush.pidtracker.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Bean;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.servlet.config.annotation.CorsRegistry;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.LogManager;
 import java.util.logging.Logger;
 
 @RestController
 @RequestMapping("/dev")
+@CrossOrigin
 public class DevController {
     @Autowired
     private UserService userService;
@@ -42,12 +46,12 @@ public class DevController {
         }
         String username = jwtService.extractUsername(token2);
         Optional<UserInfo> sender = userService.findUserByName(username);
-        Optional<UserInfo> reviewer = userService.getUserByStatus(false,sender.get().getName());
+        List<Optional<UserInfo>>  reviewer = userService.getUserByStatus(false,sender.get().getName());
         if(reviewer.isEmpty())
         {
 
             reviewer = userService.getUserByStatus(true,sender.get().getName());
-            logger.log(Level.INFO,reviewer.get().getName());
+            //logger.log(Level.INFO,reviewer.get().getName());
             if(reviewer == null)
             {
                 map.put("success" , false);
@@ -55,8 +59,8 @@ public class DevController {
                 return map;
             }
         }
-        logger.log(Level.INFO,reviewer.get().getName());
-        int success = userService.changeUserStatus(reviewer.get().getName(),true);
+        //logger.log(Level.INFO,reviewer.get().getName());
+        int success = userService.changeUserStatus(reviewer.get(0).get().getName(),true);
 
         if(success <= 0)
         {
@@ -65,7 +69,7 @@ public class DevController {
             return map;
         }
 
-        String fileUpload = storageService.uploadImage2(file,comment,reviewer.get().getName(),sender.get().getName());
+        String fileUpload = storageService.uploadImage2(file,comment,reviewer.get(0).get().getName(),sender.get().getName());
         logger.log(Level.INFO,fileUpload);
         if(fileUpload == null) {
             map.put("success", false);
@@ -80,7 +84,7 @@ public class DevController {
     }
 
     @GetMapping("/approved")
-    public List<ImageData> getApprovedFiles(@RequestHeader("token") String authHeader){
+    public List<ImageData> getApprovedFiles(@RequestHeader("Authorization") String authHeader){
         Map<String, Object> map = new HashMap<String, Object>();
         String token2 = authHeader.substring(7);
         if(token2 == null)
@@ -92,6 +96,7 @@ public class DevController {
         String username = jwtService.extractUsername(token2);
         return storageService.findFilesForDev(username,true);
     }
+
 
     @GetMapping("/pending")
     public List<ImageData> getPendingFiles(@RequestHeader("Authorization") String authHeader){
@@ -173,4 +178,30 @@ public class DevController {
 
         return map;
     }
+
+//    @Bean
+//    public WebMvcConfigurer corsConfigurer() {
+//        return new WebMvcConfigurer() {
+//            @Override
+//            public void addCorsMappings(CorsRegistry registry) {
+//                registry.addMapping("/dev/**")
+//
+//
+//                        .allowedHeaders("file","fileName","comment","pass","Access-Control-Allow-Headers","Authorization")
+//                        .exposedHeaders("Content-Disposition");
+//            }
+//        };
+//    }
+//    @Bean
+//    CorsConfigurationSource corsConfigurationSource() {
+//        CorsConfiguration configuration = new CorsConfiguration();
+//        configuration.setAllowedOrigins(Arrays.asList("http://localhost:3000/**"));
+//        configuration.setAllowedMethods(Arrays.asList("GET","POST"));
+//        configuration.setAllowedHeaders(Arrays.asList("Access-Control-Allow-Headers","file","fileName","comment","pass","Authorization"));
+//        configuration.addExposedHeader("Content-Disposition");
+//        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+//        source.registerCorsConfiguration("/**", configuration);
+//        return source;
+//    }
+
 }

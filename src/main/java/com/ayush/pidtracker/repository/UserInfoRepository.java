@@ -6,6 +6,7 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.Optional;
 
 @Transactional
@@ -19,7 +20,7 @@ public interface UserInfoRepository extends JpaRepository<UserInfo, Integer> {
     Optional<UserInfo> findUserByName(String name);
 
     @Query("SELECT u FROM UserInfo u WHERE u.currently_reviewing = ?1 and u.name <> ?2")
-    Optional<UserInfo> getUserByStatus(Boolean status , String name);
+    List<Optional<UserInfo>> getUserByStatus(Boolean status , String name);
 
     @Modifying
     @Query("UPDATE UserInfo u SET u.currently_reviewing = ?2 WHERE u.name = ?1")

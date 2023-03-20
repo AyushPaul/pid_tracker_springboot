@@ -66,30 +66,20 @@ public class PidtrackerApplication {
 		//return ResponseEntity.status(HttpStatus.OK).body(files);
 	}
 
-	@Bean
-	public WebMvcConfigurer corsConfigurer() {
-		return new WebMvcConfigurer() {
-			@Override
-			public void addCorsMappings(CorsRegistry registry) {
-				registry.addMapping("/**")
+//	@Bean
+//	public WebMvcConfigurer corsConfigurer() {
+//		return new WebMvcConfigurer() {
+//			@Override
+//			public void addCorsMappings(CorsRegistry registry) {
+//				registry.addMapping("/**")
+//
+//
+//						.allowedHeaders("file","comment","pass","Access-Control-Allow-Headers")
+//						.exposedHeaders("Content-Disposition");
+//			}
+//		};
+//	}
 
-
-						.allowedHeaders("file","comment","pass","Access-Control-Allow-Headers")
-						.exposedHeaders("Content-Disposition");
-			}
-		};
-	}
-	@Bean
-	CorsConfigurationSource corsConfigurationSource() {
-		CorsConfiguration configuration = new CorsConfiguration();
-		configuration.setAllowedOrigins(Arrays.asList("http://localhost:3000/**"));
-		configuration.setAllowedMethods(Arrays.asList("GET","POST"));
-		configuration.setAllowedHeaders(Arrays.asList("Access-Control-Allow-Headers","file","comment","pass"));
-		configuration.addExposedHeader("Content-Disposition");
-		UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-		source.registerCorsConfiguration("/**", configuration);
-		return source;
-	}
 	public static void main(String[] args) {
 		SpringApplication.run(PidtrackerApplication.class, args);
 	}

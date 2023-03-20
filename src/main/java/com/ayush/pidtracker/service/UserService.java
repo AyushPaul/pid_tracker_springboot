@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -20,7 +21,7 @@ public class UserService {
         userInfo.setPassword(passwordEncoder.encode(userInfo.getPassword()));
         userInfo.setCurrently_reviewing(false);
         repository.save(userInfo);
-        return "user added to system ";
+        return "success";
     }
 
     public Optional<UserInfo> findUserById(Integer Id){
@@ -32,8 +33,8 @@ public class UserService {
         return userInfo;
     }
 
-    public Optional<UserInfo> getUserByStatus(Boolean Status , String name){
-        Optional<UserInfo> userInfo = repository.getUserByStatus(Status,name);
+    public List<Optional<UserInfo>> getUserByStatus(Boolean Status , String name){
+        List<Optional<UserInfo>>  userInfo = repository.getUserByStatus(Status,name);
         return userInfo;
     }
 

@@ -54,6 +54,7 @@ public class MailService {
                 "javax.net.ssl.SSLSocketFactory");
         properties.put("mail.smtp.auth", "true");
         properties.put("mail.smtp.port", "587");
+        properties.put("mail.smtp.starttls.enable", "true");
         sendMail2(properties, username, password, from, to,
                 subject, text);
     }
@@ -67,7 +68,7 @@ public class MailService {
                     @Override
                     protected PasswordAuthentication
                     getPasswordAuthentication() {
-                        return new PasswordAuthentication(username,
+                        return new PasswordAuthentication(fromEmailAddress,
                                 password);
                     }
                 });

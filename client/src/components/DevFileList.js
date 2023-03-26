@@ -69,8 +69,8 @@ function DevFileList(props) {
         })
     }, [])
 
-    const handleFileDownload = async (fileId) => {
-        const fileDownloadResponse = await getFileData(fileId)
+    const handleFileDownload = async (fileId,name) => {
+        const fileDownloadResponse = await getFileData(fileId,name)
 
         const toast = createStandaloneToast()
         
@@ -105,7 +105,7 @@ function DevFileList(props) {
         if(ref.current)
         {
             ref.current.click();
-            setFile({fileId:efileId,fileName:efileName,comment:ecomment});
+            setFile({id:efileId,name:efileName,comment:ecomment});
 
         }
         
@@ -155,7 +155,7 @@ function DevFileList(props) {
         }
         console.log(file)
         const fileService = new FileService(file[0],comment)
-        const fileUploadResponse = await fileService.uploadFile4(efile.fileId)
+        const fileUploadResponse = await fileService.uploadFile4(efile.name)
 
         element.value = ''
 
@@ -187,7 +187,7 @@ function DevFileList(props) {
                             <form className="my-3">
                                 <div className="mb-3">
                                     <label htmlFor="title" className="form-label">File Name</label>
-                                    <input type="text" disabled={true} className="form-control" id="etitle" name="etitle" value={efile.fileName} aria-describedby="emailHelp" onChange={onChange} minLength={5} required/>
+                                    <input type="text" disabled={true} className="form-control" id="etitle" name="etitle" value={efile.name} aria-describedby="emailHelp" onChange={onChange} minLength={5} required/>
                                 </div>
                                 <div className="mb-3">
                                     <label htmlFor="description" className="form-label">Comment</label>
@@ -227,20 +227,20 @@ function DevFileList(props) {
 
         <div className='row my-3'>
             
-            {fileList.map(({ fileId, fileName, comment }) => (
+            {fileList.map(({ id, name, comment, reviewer_id }) => (
                         <div className="col-md-4" key={fileId}>
                             <div className="card my-3 text-center d-flex">
                             <div className="card-header">
-                                File : {fileName}
+                                File : {name}
                             </div>
                             <div className="card-body">
                                 <h5 className="card-title"><b>Comment:</b></h5>
                                 <p className="card-text my-3">{comment}</p>
-                                <Link to="/" onClick={() => handleFileDownload(fileId)} className="btn btn-outline-primary mx-3">Download File</Link>
-                                <Link to="/" onClick={() => handleFileUpdate(fileId,fileName,comment)} className="btn btn-outline-primary">Review</Link>
+                                <Link to="/" onClick={() => handleFileDownload(id,name)} className="btn btn-outline-primary mx-3">Download File</Link>
+                                <Link to="/" onClick={() => handleFileUpdate(id,name,comment)} className="btn btn-outline-primary">Review</Link>
                             </div>
                             <div className="card-footer text-muted">
-                                2 days ago
+                                Reviewed By {reviewer_id}
                             </div>
                         </div>
                         </div>

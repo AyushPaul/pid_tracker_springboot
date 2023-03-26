@@ -105,7 +105,7 @@ function FileList(props) {
         if(ref.current)
         {
             ref.current.click();
-            setFile({fileId:efileId,fileName:efileName,comment:ecomment});
+            setFile({id:efileId,name:efileName,comment:ecomment});
 
         }
         
@@ -155,7 +155,7 @@ function FileList(props) {
         }
         console.log(file)
         const fileService = new FileService(file[0],comment)
-        const fileUploadResponse = await fileService.uploadFile3(efile.fileId)
+        const fileUploadResponse = await fileService.uploadFile3(efile.name)
 
         element.value = ''
 
@@ -187,7 +187,7 @@ function FileList(props) {
                             <form className="my-3">
                                 <div className="mb-3">
                                     <label htmlFor="title" className="form-label">File Name</label>
-                                    <input type="text" disabled={true} className="form-control" id="etitle" name="etitle" value={efile.fileName} aria-describedby="emailHelp" onChange={onChange} />
+                                    <input type="text" disabled={true} className="form-control" id="etitle" name="etitle" value={efile.name} aria-describedby="emailHelp" onChange={onChange} />
                                 </div>
                                 <div className="mb-3">
                                     <label htmlFor="description" className="form-label">Comment</label>
@@ -217,7 +217,7 @@ function FileList(props) {
                         </div>
                         <div className="modal-footer">
                             <button ref={refClose} type="button" className="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                            <button  onClick={handleClick} type="button" className="btn btn-primary">Update Note</button>
+                            <button  onClick={handleClick} type="button" className="btn btn-primary">Update File</button>
                         </div>
                     </div>
                 </div>
@@ -228,7 +228,7 @@ function FileList(props) {
         <div className='row my-3'>
             
             {fileList.map(({ id, name, comment, user_id }) => (
-                        <div className="col-md-4" key={fileId}>
+                        <div className="col-md-4" key={id}>
                             <div className="card my-3 text-center d-flex">
                             <div className="card-header">
                                 File : {name}

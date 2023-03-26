@@ -31,6 +31,7 @@ import java.util.Arrays;
 
 import static org.springframework.security.config.Customizer.withDefaults;
 
+
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
@@ -55,10 +56,12 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         return http
-                .cors(withDefaults())
+
                 .csrf().disable()
+                .cors(withDefaults())
                 .authorizeHttpRequests()
-                .requestMatchers("/user/**","/image/**").permitAll()
+                .requestMatchers("/user/**","/image/**")
+                .permitAll()
                 .and()
                 .authorizeHttpRequests().requestMatchers("/dev/**","/rev/**","/image/**")
                 .authenticated()
@@ -105,9 +108,10 @@ public class SecurityConfig {
     @Bean
     CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(Arrays.asList("http://localhost:3000","http://localhost:3000/login"));
+        configuration.setAllowedOrigins(Arrays.asList("http://localhost:3000/","http://localhost:3000/signup","*"));
+        configuration.addAllowedOrigin("*");
         configuration.setAllowedMethods(Arrays.asList("GET","POST"));
-        configuration.setAllowedHeaders(Arrays.asList("Access-Control-Allow-Headers","file","fileName","comment","pass","Authorization"));
+        configuration.setAllowedHeaders(Arrays.asList("Access-Control-Allow-Headers","file","fileName","comment","pass","Authorization","Access-Control-Allow-Origin","name","authtoken","token","Content-Type"));
         configuration.addExposedHeader("Content-Disposition");
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);

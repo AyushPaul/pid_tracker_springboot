@@ -33,7 +33,7 @@ public class StorageService {
         return null;
     }
 
-    public String uploadImage2(MultipartFile file, String comment , String reviewer, String user) throws IOException {
+    public String uploadImage2(MultipartFile file, String comment , String reviewer, String user, Boolean status) throws IOException {
 
         ImageData imageData = repository.save(ImageData.builder()
                 .name(file.getOriginalFilename())
@@ -41,7 +41,7 @@ public class StorageService {
                 .comment(comment)
                 .user_id(user)
                 .reviewer_id(reviewer)
-                .reviewed(false)
+                .reviewed(status)
                 .imageData(ImageUtils.compress(file.getBytes())).build());
         if (imageData != null) {
             return "file uploaded successfully : " + file.getOriginalFilename() + " by User Id : " + user;

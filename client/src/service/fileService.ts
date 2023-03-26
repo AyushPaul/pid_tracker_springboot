@@ -73,14 +73,14 @@ class FileService
             message: 'Uploaded Successfully'
         }
     }
-    async uploadFile3(fileID:number): Promise<UploadFileResponse> {
+    async uploadFile3(fileID:string): Promise<UploadFileResponse> {
         const data = this.getFormData();
         console.log("uploadfile3 : "+ fileID);
-        data.append('fid', fileID.toString());
-        const uploadResponse = await fetch('http://localhost:5000/api/reviewer/uploadfile', {
+        data.append('fileName', fileID);
+        const uploadResponse = await fetch('http://localhost:9191/rev/uploadfile', {
             method: 'POST',
             headers:{
-                'auth-token':localStorage.getItem('token') || ''
+                'Authorization':`Bearer ${localStorage.getItem('token')}` || ''
             },
             body: data
         })
@@ -100,14 +100,14 @@ class FileService
         }
     }
 
-    async uploadFile4(fileID:number): Promise<UploadFileResponse> {
+    async uploadFile4(fileID:string): Promise<UploadFileResponse> {
         const data = this.getFormData();
         console.log("uploadfile4 : "+ fileID);
-        data.append('fid', fileID.toString());
-        const uploadResponse = await fetch('http://localhost:5000/api/developer/uploadfilerev', {
+        data.append('fileName', fileID);
+        const uploadResponse = await fetch('http://localhost:9191/dev/uploadfilerev', {
             method: 'POST',
             headers:{
-                'auth-token':localStorage.getItem('token') || ''
+                'Authorization':`Bearer ${localStorage.getItem('token')}` || ''
             },
             body: data
         })

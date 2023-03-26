@@ -109,7 +109,7 @@ public class RevController {
             map.put("message","Error Changing File Status.");
             return map;
         }
-        String fileUpload = storageService.uploadImage2(file,comment,reviewer.get().getName(),dev.get().getName());
+        String fileUpload = storageService.uploadImage2(file,comment,reviewer.get().getName(),dev.get().getName(),true);
         //logger.log(Level.INFO,fileUpload);
         if(fileUpload == null) {
             map.put("success", false);

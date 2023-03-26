@@ -3,6 +3,7 @@ package com.ayush.pidtracker.controller;
 import com.ayush.pidtracker.entity.ImageData;
 import com.ayush.pidtracker.entity.UserInfo;
 import com.ayush.pidtracker.service.JwtService;
+import com.ayush.pidtracker.service.MailService;
 import com.ayush.pidtracker.service.StorageService;
 import com.ayush.pidtracker.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,6 +32,9 @@ public class DevController {
     private JwtService jwtService;
     @Autowired
     private StorageService storageService;
+
+    @Autowired
+    private MailService mailService;
 
     @PostMapping("/uploadfile")
     public Map<String, Object> uploadNewFile(@RequestParam("file") MultipartFile file , @RequestParam("comment") String comment, @RequestParam("pass") String pass, @RequestHeader("Authorization") String authHeader) throws IOException {
@@ -69,17 +73,19 @@ public class DevController {
             return map;
         }
 
-        String fileUpload = storageService.uploadImage2(file,comment,reviewer.get(0).get().getName(),sender.get().getName());
+        String fileUpload = storageService.uploadImage2(file,comment,reviewer.get(0).get().getName(),sender.get().getName(),false);
         logger.log(Level.INFO,fileUpload);
         if(fileUpload == null) {
             map.put("success", false);
             map.put("message", "Error Uploading File.");
             return map;
         }
-
+//        Map<String,Object> mailStatus = mailService.sendMail(sender.get().getEmail(),reviewer.get(0).get().getEmail(),comment,"Hey your review is Pending");
+//        mailStatus.put("fileMessage",fileUpload);
+//        mailStatus.put("reviewer",reviewer.get(0).get().getName());
         map.put("success" , true);
         map.put("message",fileUpload);
-
+        map.put("reviewer",reviewer.get(0).get().getName());
         return map;
     }
 
@@ -127,7 +133,7 @@ public class DevController {
         String username = jwtService.extractUsername(token2);
         Optional<UserInfo> dev = userService.findUserByName(username);
         Optional<ImageData> prev_file = storageService.findFileByName(fileName);
-        Optional<UserInfo> reviewer = userService.findUserByName(prev_file.get().getUser_id());
+        Optional<UserInfo> reviewer = userService.findUserByName(prev_file.get().getReviewer_id());
         if(reviewer.isEmpty())
         {
             map.put("success" , false);
@@ -165,7 +171,7 @@ public class DevController {
             map.put("message","Error Changing File Status.");
             return map;
         }
-        String fileUpload = storageService.uploadImage2(file,comment,reviewer.get().getName(),dev.get().getName());
+        String fileUpload = storageService.uploadImage2(file,comment,reviewer.get().getName(),dev.get().getName(),false);
         //logger.log(Level.INFO,fileUpload);
         if(fileUpload == null) {
             map.put("success", false);
@@ -173,9 +179,12 @@ public class DevController {
             return map;
         }
 
+         mailService.sendMailUsingSSL(dev.get().getName(),pass,dev.get().getEmail(),reviewer.get().getEmail(),"Hey your pid review is Penidng",comment);
+//        mailStatus.put("fileMessage",fileUpload);
+//        mailStatus.put("reviewer",reviewer.get().getName());
         map.put("success" , true);
         map.put("message",fileUpload);
-
+        map.put("reviewer",reviewer.get().getName());
         return map;
     }
 

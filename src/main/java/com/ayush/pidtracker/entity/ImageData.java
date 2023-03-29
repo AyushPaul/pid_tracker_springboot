@@ -6,6 +6,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.Date;
 
 
 @Entity
@@ -33,4 +34,7 @@ public class ImageData {
 
     @Column(columnDefinition = "boolean default false")
     private Boolean reviewed;
+
+    @Temporal(TemporalType.DATE)
+    Date creationDate;
 }

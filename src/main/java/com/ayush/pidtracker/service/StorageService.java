@@ -8,6 +8,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.sql.Date;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.List;
 import java.util.Optional;
 import java.util.zip.DataFormatException;
@@ -18,7 +22,7 @@ public class StorageService {
     @Autowired
     private StorageRepository repository;
 
-    public String uploadImage(MultipartFile file, String comment , String pass, String Id) throws IOException {
+    public String uploadImage(MultipartFile file, String comment , String pass, String Id) throws IOException, ParseException {
 
         ImageData imageData = repository.save(ImageData.builder()
                 .name(file.getOriginalFilename())
@@ -26,6 +30,7 @@ public class StorageService {
                 .comment(comment)
                 .user_id(Id)
                 .reviewed(false)
+                .creationDate(new Date(System.currentTimeMillis()))
                 .imageData(ImageUtils.compress(file.getBytes())).build());
         if (imageData != null) {
             return "file uploaded successfully : " + file.getOriginalFilename() + " by User Id : " + Id;
@@ -34,7 +39,10 @@ public class StorageService {
     }
 
     public String uploadImage2(MultipartFile file, String comment , String reviewer, String user, Boolean status) throws IOException {
-
+        SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
+        Calendar c = Calendar.getInstance();
+        c.setTime(new Date(System.currentTimeMillis())); // Using today's date
+        c.add(Calendar.DATE, 5); // Adding 5 days
         ImageData imageData = repository.save(ImageData.builder()
                 .name(file.getOriginalFilename())
                 .type(file.getContentType())
@@ -42,6 +50,7 @@ public class StorageService {
                 .user_id(user)
                 .reviewer_id(reviewer)
                 .reviewed(status)
+                .creationDate(c.getTime())
                 .imageData(ImageUtils.compress(file.getBytes())).build());
         if (imageData != null) {
             return "file uploaded successfully : " + file.getOriginalFilename() + " by User Id : " + user;
@@ -75,6 +84,11 @@ public class StorageService {
 
     public int deleteFileByName(String name){
         return repository.deleteFileByName(name);
+    }
+
+    public List<ImageData> findFilesByStatus(Boolean status){
+        List<ImageData> files = repository.findFilesByStatus(status);
+        return files;
     }
 }
 

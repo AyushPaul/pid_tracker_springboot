@@ -24,6 +24,9 @@ public interface StorageRepository extends JpaRepository<ImageData,Long> {
     @Query("SELECT img from ImageData img WHERE img.reviewer_id = ?1 AND img.reviewed = ?2")
     List<ImageData> findFilesForRev(String name , Boolean status);
 
+    @Query("SELECT img from ImageData img WHERE img.reviewed = ?1")
+    List<ImageData> findFilesByStatus(Boolean status);
+
 
     @Modifying
     @Query("DELETE from ImageData img WHERE img.name=?1")

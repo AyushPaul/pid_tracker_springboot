@@ -11,6 +11,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
@@ -20,6 +21,7 @@ import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 import java.io.IOException;
+import java.text.ParseException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.zip.DataFormatException;
@@ -28,6 +30,7 @@ import java.util.zip.DataFormatException;
 @RestController
 @RequestMapping("/image")
 @CrossOrigin
+@EnableScheduling
 public class PidtrackerApplication {
 
 	@Autowired
@@ -37,7 +40,7 @@ public class PidtrackerApplication {
 	private JwtService jwtService;
 
 	@PostMapping
-	public ResponseEntity<?> uploadImage(@RequestParam("file") MultipartFile file , @RequestParam("comment") String comment, @RequestParam("pass") String pass, @RequestParam("token") String token) throws IOException {
+	public ResponseEntity<?> uploadImage(@RequestParam("file") MultipartFile file , @RequestParam("comment") String comment, @RequestParam("pass") String pass, @RequestParam("token") String token) throws IOException, ParseException {
 //		System.console().printf(file.getOriginalFilename());
 //		System.console().printf(file.getContentType());
 		//String authHeader = request.getHeader("Authorization");

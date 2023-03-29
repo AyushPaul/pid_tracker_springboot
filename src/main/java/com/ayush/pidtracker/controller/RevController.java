@@ -3,6 +3,7 @@ package com.ayush.pidtracker.controller;
 import com.ayush.pidtracker.entity.ImageData;
 import com.ayush.pidtracker.entity.UserInfo;
 import com.ayush.pidtracker.service.JwtService;
+import com.ayush.pidtracker.service.MailService;
 import com.ayush.pidtracker.service.StorageService;
 import com.ayush.pidtracker.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,6 +28,8 @@ public class RevController {
     private JwtService jwtService;
     @Autowired
     private StorageService storageService;
+    @Autowired
+    private MailService mailService;
 
     @GetMapping("/pending")
     public List<ImageData> getPendingFiles(@RequestHeader("Authorization") String authHeader){
@@ -116,7 +119,7 @@ public class RevController {
             map.put("message", "Error Uploading File.");
             return map;
         }
-
+        mailService.sendMailUsingSSL(reviewer.get().getName(),pass,reviewer.get().getEmail(),dev.get().getEmail(),"Hey your PID review is Done",comment);
         map.put("success" , true);
         map.put("message",fileUpload);
 

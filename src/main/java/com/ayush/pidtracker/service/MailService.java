@@ -75,6 +75,7 @@ public class MailService {
         try {
             Message msg = new MimeMessage(session);
             msg.setFrom(new InternetAddress(fromEmailAddress));
+
             msg.setRecipients(Message.RecipientType.TO,
                     InternetAddress.parse(toEmailAddress));
             msg.setSubject(subject);

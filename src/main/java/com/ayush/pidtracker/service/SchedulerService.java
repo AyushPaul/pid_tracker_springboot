@@ -38,7 +38,7 @@ public class SchedulerService {
                 c.setTime(dueDate);
                 c.add(Calendar.DATE,-3);
 
-                if(currDate.before(c.getTime()))
+                if(currDate.after(c.getTime()))
                 {
                     Optional<UserInfo> reviewer = userService.findUserByName(file.getReviewer_id());
                     Optional<UserInfo> developer = userService.findUserByName(file.getUser_id());

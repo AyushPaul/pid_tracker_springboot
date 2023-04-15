@@ -1,4 +1,4 @@
-import { useState, useEffect , useContext, useRef } from 'react'
+import React,{ useState, useEffect , useContext, useRef } from 'react'
 import FileContext from '../context/files/FileContext'
 import {
     Flex,
@@ -10,9 +10,14 @@ import {
 } from '@chakra-ui/react'
 
 import { getFileData } from '../service/FileDownloadService'
+import { displayWordDoc } from '../service/FileDisplayService'
 import FileUpload from './FileUpload'
 import { validateFileSize, validateFileType } from '../service/fileValidatorService'
 import FileService from '../service/fileService'
+import JSZip from 'jszip';
+import { convert } from 'docx-to-html';
+// import { parseDocx } from 'docx-parser';
+
 // interface Props {
 //     fileId: number
 // }
@@ -24,6 +29,7 @@ function DevPendingFileList(props) {
     const ref = useRef(null)
     const refClose = useRef(null)
     const refSubmit = useRef(null)
+    //const JSZip = require('jszip');
     //const context = useContext(FileContext);
     //const {Files, getFiles} = context;
     const host = "http://localhost:5000"
@@ -32,6 +38,7 @@ function DevPendingFileList(props) {
     const [isFileTypesModalOpen, setIsFilesTypeModalOpen] = useState(false)
     const [uploadFormError, setUploadFormError] = useState('')
     const [value,setvalue] = useState('')
+    const [documentContent, setDocumentContent] = useState('');
 
     // const getFiles = async ()=>{
     //     const response = await fetch("http://localhost:5000/api/files/fetchfiles", {
@@ -81,6 +88,55 @@ function DevPendingFileList(props) {
             isClosable: true
         })
     }
+    const handleFileView = async (fileName) => {
+         const fileDownloadResponse = await displayWordDoc(fileName)
+         const reader = new FileReader();
+         reader.onload = function(e) {
+            const content = e.target.result;
+            console.log(content);
+            //displayDocument(content);
+            loadDocument(content)
+        };
+        reader.readAsArrayBuffer(fileDownloadResponse);
+        // const toast = createStandaloneToast()
+        
+        // toast({
+        //     title: fileDownloadResponse ? 'Download Successful' : 'Download Failed',
+        //     status: fileDownloadResponse ? 'success' : 'error',
+        //     duration: 3000,
+        //     isClosable: true
+        // })
+    }
+    function displayDocument(content) {
+        //const documentContainer = document.getElementById('documentContainer');
+        //documentContainer.innerHTML = `
+        //   <iframe
+        //     width="100%"
+        //     height="600px"
+        //     src="https://view.officeapps.live.com/op/embed.aspx?src=${encodeURIComponent(URL.createObjectURL(new Blob([content], { type: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' })))}"
+        //     frameborder="0">
+        //   </iframe>
+        //`;
+        JSZip.loadAsync(content).then(function(zip) {
+            const documentXml = zip.file('word/document.xml').async('string');
+            return Promise.all([documentXml]);
+          })
+          .then(function(results) {
+            const documentXml = results[0];
+            const parser = new DOMParser();
+            const _document = parser.parseFromString(documentXml, 'application/xml');
+        
+            // Create a new div element to hold the document contents
+            const documentDiv = document.createElement('div');
+            documentDiv.innerHTML = _document.getElementsByTagName('body')[0].innerHTML;
+        
+            // Append the div to the document body
+            document.body.appendChild(documentDiv);
+          })
+          .catch(function(error) {
+            console.log(error);
+          });
+      }
 
     if (fileList.length === 0) {
         return null
@@ -171,6 +227,52 @@ function DevPendingFileList(props) {
         //setFileId(fileUploadResponse.fileId ?? 0)
     }
 
+    
+
+  async function loadDocument(fileName) {
+
+
+    fetch(`http://localhost:9191/image/${fileName}`)
+      .then(response => response.arrayBuffer())
+      .then(buffer => {
+        JSZip.loadAsync(buffer)
+          .then(zip => zip.file('word/document.xml').async('string'))
+          .then(documentXml =>  {
+            const parser = new DOMParser();
+            console.log(documentXml)
+            const _document =  parser.parseFromString(documentXml, 'application/xml');
+            console.log(_document.documentElement.textContent);
+            console.log(_document.getElementsByTagName('w:body')[0].innerHTML);
+            setDocumentContent(_document.getElementsByTagName('w:body')[0].innerHTML);
+          })
+          .catch(error => console.log(error));
+      })
+      .catch(error => console.log(error));
+
+
+    // fetch(`http://localhost:9191/image/${fileName}`)
+    // .then(response => response.arrayBuffer())
+    // .then(buffer => {
+    //   convert(buffer).then(html => {
+    //     setDocumentContent(html);
+    //   });
+    // })
+    // .catch(error => console.log(error));
+    // const html = await convert(fileName);
+    // console.log(html);
+    // setDocumentContent(html);
+
+
+    // fetch(`http://localhost:9191/image/${fileName}`)
+    // .then(response => response.arrayBuffer())
+    // .then(buffer => {
+    //   parseDocx(buffer).then(html => {
+    //     setDocumentContent(html);
+    //   });
+    // })
+    // .catch(error => console.log(error));
+  }
+
     return (
         <>
         <button ref={ref} type="button" className="btn btn-primary d-none" data-bs-toggle="modal" data-bs-target="#exampleModal">
@@ -222,7 +324,7 @@ function DevPendingFileList(props) {
                     </div>
                 </div>
             </div>
-
+            {<div dangerouslySetInnerHTML={{ __html: documentContent }}></div>}
 
 
         <div className='row my-3'>
@@ -238,6 +340,8 @@ function DevPendingFileList(props) {
                                 <p className="card-text my-3">{comment}</p>
                                 <Link to="/" onClick={() => handleFileDownload(id,name)} className="btn btn-outline-primary mx-3">Download File</Link>
                                 <Link to="/" onClick={() => handleFileUpdate(id,name,comment)} className="btn btn-outline-primary d-none">Review</Link>
+                                {/* <Link to="/" onClick={() => handleFileView(name)} className="btn btn-outline-primary">View File</Link> */}
+                                <Link to="/" onClick={() => loadDocument(name)} className="btn btn-outline-primary">View File</Link>
                             </div>
                             <div className="card-footer text-muted">
                                 Assigned to {reviewer_id}
@@ -246,7 +350,13 @@ function DevPendingFileList(props) {
                         </div> 
                     
                 ))}
+
+                
         </div>
+
+        <div id="documentContainer"></div>
+        {/* <button onClick={loadDocument}>Load Document</button> */}
+      
         </>    
     )
 }

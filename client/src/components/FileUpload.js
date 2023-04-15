@@ -1,4 +1,4 @@
-import { SyntheticEvent, useState, Dispatch, SetStateAction } from 'react'
+import { SyntheticEvent, useState, Dispatch, SetStateAction,useRef } from 'react'
 import {
     Box,
     Text,
@@ -19,6 +19,10 @@ import {
 import AcceptedFileTypesModal from './AcceptedFileTypesModal'
 import { validateFileSize, validateFileType } from '../service/fileValidatorService'
 import FileService from '../service/fileService'
+const Office = window.Office;
+const Word = window.Word;
+
+const JSZip = require('jszip');
 //import { Form } from "react-final-form"
 // interface Props {
 //     setFileId: Dispatch<SetStateAction<number>>
@@ -33,6 +37,7 @@ function FileUpload(props) {
     const [isFileTypesModalOpen, setIsFilesTypeModalOpen] = useState(false)
     const [uploadFormError, setUploadFormError] = useState('')
     const [value,setvalue] = useState('')
+    const ref = useRef(null)
 
     const handleInputChange = (e) => {
         let inputValue = e.target.value
@@ -40,6 +45,16 @@ function FileUpload(props) {
       }
       const handleSubmit = async (e) =>{
         console.log(e.target[0].value);
+        const file = e.target[1].files[0];
+        console.log("File :")
+        console.log(file)
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    const content = e.target.result;
+    console.log(content);
+    displayDocument(content);
+  };
+  reader.readAsArrayBuffer(file);
         handleFileUpload(e.target[1],e.target[0].value)
         e.preventDefault();
         
@@ -87,7 +102,52 @@ function FileUpload(props) {
         //setFileId(fileUploadResponse.fileId ?? 0)
     }
 
+    function displayDocument(content) {
+        // const documentContainer = document.getElementById('documentContainer');
+        // documentContainer.innerHTML = `
+        //   <iframe
+        //     width="100%"
+        //     height="600px"
+        //     src="https://view.officeapps.live.com/op/embed.aspx?src=https://file-examples-com.github.io/uploads/2017/02/file-sample_100kB.doc"
+        //     frameborder="0">
+        //   </iframe>
+        // `;
+
+        // Word.run(function(context) {
+        //     const newDocument = context.application.createDocument();
+        //     const body = newDocument.body;
+        //     const range = body.insertFileFromBase64(content, 'replace');
+        //     range.select();
+        //     return context.sync().then(function() {
+        //       const documentContainer = document.getElementById('documentContainer');
+        //       documentContainer.innerHTML = '';
+        //       documentContainer.appendChild(newDocument.getHtml());
+        //     });
+        //   })
+        //   .catch(function(error) {
+        //     console.log(error);
+        //   });
+
+        JSZip.loadAsync(content).then(function(zip) {
+            const documentXml = zip.file('word/document.xml').async('string');
+            return Promise.all([documentXml]);
+          })
+          .then(function(results) {
+            const documentXml = results[0];
+            console.log(documentXml);
+            const parser = new DOMParser();
+            const _document = parser.parseFromString(documentXml, 'application/xml');
+            console.log(_document);
+            const documentContainer = ref
+            documentContainer.innerHTML = _document.getElementsByTagName('body')[0].innerHTML;
+          })
+          .catch(function(error) {
+            console.log(error);
+          });
+      }
+
     return (
+        <>
         <Box
             width="50%"
             m="100px auto"
@@ -143,6 +203,9 @@ function FileUpload(props) {
                 onClose={() => setIsFilesTypeModalOpen(false)}
             />
         </Box>
+
+        <div id="documentContainer" ref={ref}></div>
+        </>
     )
 }
 

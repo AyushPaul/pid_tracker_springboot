@@ -7,6 +7,39 @@
 
 This is a web-based application that allows developers to upload PIDs (Project Initiation Document) and reviewers to review them. The application has features such as user authentication and authorization, file upload and compression, automatic assignment of reviewers, email notifications, and more.
 
+## Features
+- **User Authentication and Authorization with Spring Security**:
+The application uses Spring Security to authenticate and authorize users. Users can sign up, login and logout from the application. JWT token is used to maintain user session.
+
+- **Creating a New User**:
+The endpoint /api/users/signup is used to create a new user. The endpoint requires the following fields in the request body: firstName, lastName, email, password, roles. The roles field is an array of strings representing the user's roles.
+
+- **Uploading a PID**:
+The endpoint /api/pid/upload is used to upload a new PID. The endpoint requires the following fields in the request body: title, description, keywords, file. The file is compressed and stored in the backend in blob format.
+
+- **Review Assignment**:
+The application uses Round Robin algorithm to assign PIDs to reviewers. A reviewer can reject a review, in which case the PID is automatically reassigned to another reviewer.
+
+- **Automatic Reassignment of PIDs After Deadline**:
+If a reviewer fails to review a PID before the deadline, the PID is automatically reassigned to another reviewer.
+
+- **Dashboard**:
+The home page contains a dashboard that displays the number of PIDs uploaded by the user, the status of their PIDs, and other relevant metrics.
+
+- **Email Notifications**:
+The application sends email notifications to developers and reviewers when a new PID is uploaded. A background function is scheduled to send reminders about the uploaded PIDs to the reviewers.
+
+- **Integration of Word View**:
+The application integrates Word View into the portal itself.
+
+- **Admin Panel**:
+The application has an admin panel for managing users, PIDs and reviewers.
+
+- **Urgency Status Tag**:
+The application has an urgency status tag to indicate the urgency of the PID.
+
+- **Marking Other Users as Proxy**:
+A reviewer can mark another user as proxy to review a PID on their behalf.
 
 ## Technologies Used
 The project has been implemented using the following technologies:
@@ -35,6 +68,29 @@ The project is divided into several packages, each with a specific purpose:
 - `com.ayush.pidtracker.security`: This package contains the security classes used by the application.
 - `com.ayush.pidtracker.service`: This package contains the services used by the application.
 - `com.ayush.pidtracker.util`: This package contains the utility classes used by the application.
+
+## Enpoints
+Here are the endpoints that have been created for the application:
+
+- **/api/signup (POST)**: This endpoint is used for user sign up. Users provide their details in the request body and the details are saved to the database using Spring Data JPA.
+
+- **/api/login (POST)**: This endpoint is used for user login. Users provide their email and password in the request body and the application checks the database for the user's details. If the details are correct, a JWT token is generated and returned to the user.
+
+- **/api/upload (POST)**: This endpoint is used for file upload. Users provide the required details such as title, description, category, and file in the request body. The file is stored in the backend in blob format and compressed using the Java Zip API.
+
+- **/api/download/{pid} (GET)**: This endpoint is used for file download. Users provide the PID of the file they want to download in the URL path parameter. The file is downloaded in its original format.
+
+- **/api/pid (GET)**: This endpoint is used to get a list of PIDs that are pending review.
+
+- **/api/review (POST)**: This endpoint is used by reviewers to review PIDs. Reviewers provide the PID they want to review along with their review in the request body.
+
+- **/api/reject/{pid} (POST)**: This endpoint is used by reviewers to reject a review. Reviewers provide the PID they want to reject in the URL path parameter. The application then automatically reassigns the review to another reviewer.
+
+- **/api/dashboard (GET)**: This endpoint is used to get the dashboard details such as the number of PIDs uploaded by the user and the status of their PIDs (e.g. pending review, approved, rejected).
+
+
+
+
 
 
 ## User Login/Signup
@@ -66,3 +122,5 @@ https://user-images.githubusercontent.com/67481937/227757328-943723bd-17cd-4cbc-
 
 https://user-images.githubusercontent.com/67481937/228021611-d4dc86e8-c212-42ff-ae1b-864d8ce0f309.mp4
 
+## Conclusion
+This project has implemented several features that make it easy for users to upload and review PIDs. The use of Spring Security, JWT token, and Round Robin algorithm for review assignment ensures the security and efficiency of the application. The integration of Word View and the automatic reassignment of PIDs after deadline are also useful features that enhance the user experience.

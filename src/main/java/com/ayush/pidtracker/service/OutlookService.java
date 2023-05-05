@@ -6,9 +6,16 @@ import com.microsoft.graph.authentication.TokenCredentialAuthProvider;
 
 import com.microsoft.graph.models.User;
 import com.microsoft.graph.requests.GraphServiceClient;
+import com.skype.ChatMessageAdapter;
+import com.skype.Skype;
+import com.skype.SkypeException;
+import com.skype.connector.Connector;
+import com.skype.connector.ConnectorException;
+
 import okhttp3.Request;
 import org.springframework.stereotype.Service;
 
+import javax.mail.event.ConnectionListener;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -18,7 +25,7 @@ import java.util.List;
 @Service
 public class OutlookService {
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws ConnectorException {
         String clientId = "e5558843-b8d9-4907-aaa0-94083dd8a33e";
         String clientSecret ="LbV8Q~waI~wySHyWhZns9aKxW.xL7GT_MI8O4cdi";
         String tenantId = "f8cdef31-a31e-4b4a-93e4-5f571e91255a";
@@ -49,6 +56,18 @@ public class OutlookService {
             System.out.println("User " + userEmail + " is not out-of-office");
         }
         //System.out.println(me);
+
+
+//        Skype.setDaemon(false);
+//        try {
+//            Skype.setDebug(false);
+//        } catch (SkypeException e) {
+//            throw new RuntimeException(e);
+//        }
+//        Skype client = new Skype();
+//        client.setUser("skype_username");
+//        User user = client.getUser("skype_username");
+//        System.out.println(user.getStatus());
     }
 
 }

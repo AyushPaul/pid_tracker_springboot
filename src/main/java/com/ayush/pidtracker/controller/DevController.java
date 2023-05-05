@@ -83,7 +83,7 @@ public class DevController {
 //        Map<String,Object> mailStatus = mailService.sendMail(sender.get().getEmail(),reviewer.get(0).get().getEmail(),comment,"Hey your review is Pending");
 //        mailStatus.put("fileMessage",fileUpload);
 //        mailStatus.put("reviewer",reviewer.get(0).get().getName());
-        mailService.sendMailUsingSSL(sender.get().getName(),pass,sender.get().getEmail(),reviewer.get(0).get().getEmail(),"Hey,your PID review is Pending",comment);
+        //mailService.sendMailUsingSSL(sender.get().getName(),pass,sender.get().getEmail(),reviewer.get(0).get().getEmail(),"Hey,your PID review is Pending",comment);
         map.put("success" , true);
         map.put("message",fileUpload);
         map.put("reviewer",reviewer.get(0).get().getName());

@@ -12,6 +12,7 @@ import Login from './components/Login';
 import SignUp from './components/SignUp';
 import SelectionScreen from './components/SelectionScreen';
 import Dev from './components/Dev';
+import DocViewerWithInputApp from './components/DocViewerWithInputApp';
 
 
 ReactDOM.render(
@@ -32,6 +33,9 @@ ReactDOM.render(
           </Switch>
           <Switch>
             <Route path="/signup" element={<SignUp></SignUp>} />
+          </Switch>
+          <Switch>
+            <Route path="/test" element={<DocViewerWithInputApp></DocViewerWithInputApp>} />
           </Switch>
     </Router> 
   </div>

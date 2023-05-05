@@ -16,6 +16,17 @@ import { validateFileSize, validateFileType } from '../service/fileValidatorServ
 import FileService from '../service/fileService'
 import JSZip from 'jszip';
 import { convert } from 'docx-to-html';
+import word2html from 'html-docx-js';
+import jsPDF from 'jspdf';
+import 'jspdf-autotable';
+import Docxtemplater from "docxtemplater";
+import * as printJS from "print-js";
+// import PizZip from "pizzip";
+import { saveAs } from "file-saver";
+import DocViewer, { DocViewerRenderers } from "@cyntler/react-doc-viewer";
+import { PDFDocument } from 'pdf-lib';
+
+const PizZip = require("pizzip");
 // import { parseDocx } from 'docx-parser';
 
 // interface Props {
@@ -39,6 +50,8 @@ function DevPendingFileList(props) {
     const [uploadFormError, setUploadFormError] = useState('')
     const [value,setvalue] = useState('')
     const [documentContent, setDocumentContent] = useState('');
+    const [html, setHtml] = useState(null);
+    const [Docs,setDocs] = useState([]);
 
     // const getFiles = async ()=>{
     //     const response = await fetch("http://localhost:5000/api/files/fetchfiles", {
@@ -90,12 +103,57 @@ function DevPendingFileList(props) {
     }
     const handleFileView = async (fileName) => {
          const fileDownloadResponse = await displayWordDoc(fileName)
+         //const lob = await fileDownloadResponse.blob() 
+        //   const pdfUrl = URL.createObjectURL(fileDownloadResponse);
+        //   window.open(pdfUrl);
          const reader = new FileReader();
-         reader.onload = function(e) {
+         reader.onload = async function(e) {
             const content = e.target.result;
+
+             
+            // // //printJS(pdfUrl)
+              //setDocs([{uri: `${pdfUrl}`,fileName: fileName}])
+            //  console.log(pdfUrl)
+            // console.log(Docs)
+            let pdfDoc = await PDFDocument.create();
+            let wordDoc = await PDFDocument.load(content);
+            let wordDocPages = await pdfDoc.copyPages(wordDoc, wordDoc.getPageIndices());
+            wordDocPages.forEach(page => pdfDoc.addPage(page));
+            let pdfBytes = await pdfDoc.save();
+            const pdfUrl = URL.createObjectURL(new Blob([pdfBytes],{type: 'application/pdf'}));
             console.log(content);
+            console.log(pdfBytes);
+            console.log(pdfUrl);
             //displayDocument(content);
-            loadDocument(content)
+            //loadDocument(content)
+
+            // const zip = new PizZip(content);
+            // const docx = new Docxtemplater(zip,{
+            //     paragraphLoop: true,
+            //     linebreaks: true,
+            // });
+            // docx.render();
+            // const output = docx.getZip().generate({ type: "blob" });
+            
+
+            window.open(pdfUrl);
+            //saveAs(output, "example.docx");
+
+
+            // const wordArray = new Uint8Array(content);
+            // const html = convert(content);
+            // const doc = new jsPDF();
+            
+            // doc.html(html, {
+            // callback: () => {
+            //     doc.save('document.pdf');
+            // },
+            // x: 10,
+            // y: 10,
+            // });
+            // const pdfBlob = doc.output('blob');
+            // const pdfUrl = URL.createObjectURL(pdfBlob);
+            // window.open(pdfUrl);
         };
         reader.readAsArrayBuffer(fileDownloadResponse);
         // const toast = createStandaloneToast()
@@ -108,34 +166,39 @@ function DevPendingFileList(props) {
         // })
     }
     function displayDocument(content) {
-        //const documentContainer = document.getElementById('documentContainer');
-        //documentContainer.innerHTML = `
-        //   <iframe
-        //     width="100%"
-        //     height="600px"
-        //     src="https://view.officeapps.live.com/op/embed.aspx?src=${encodeURIComponent(URL.createObjectURL(new Blob([content], { type: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' })))}"
-        //     frameborder="0">
-        //   </iframe>
-        //`;
-        JSZip.loadAsync(content).then(function(zip) {
-            const documentXml = zip.file('word/document.xml').async('string');
-            return Promise.all([documentXml]);
-          })
-          .then(function(results) {
-            const documentXml = results[0];
-            const parser = new DOMParser();
-            const _document = parser.parseFromString(documentXml, 'application/xml');
+        const documentContainer = document.getElementById('documentContainer');
+        documentContainer.innerHTML = `
+          <iframe
+            width="100%"
+            height="600px"
+            className="application/pdf"
+            sandbox="allow-same-origin allow-scripts allow-popups allow-forms"
+            src="${URL.createObjectURL(new Blob([content]),{type: 'application/pdf'})}"
+            frameborder="0">
+          </iframe>
+        `;
+
+
+
+        // JSZip.loadAsync(content).then(function(zip) {
+        //     const documentXml = zip.file('word/document.xml').async('string');
+        //     return Promise.all([documentXml]);
+        //   })
+        //   .then(function(results) {
+        //     const documentXml = results[0];
+        //     const parser = new DOMParser();
+        //     const _document = parser.parseFromString(documentXml, 'application/xml');
         
-            // Create a new div element to hold the document contents
-            const documentDiv = document.createElement('div');
-            documentDiv.innerHTML = _document.getElementsByTagName('body')[0].innerHTML;
+        //     // Create a new div element to hold the document contents
+        //     const documentDiv = document.createElement('div');
+        //     documentDiv.innerHTML = _document.getElementsByTagName('body')[0].innerHTML;
         
-            // Append the div to the document body
-            document.body.appendChild(documentDiv);
-          })
-          .catch(function(error) {
-            console.log(error);
-          });
+        //     // Append the div to the document body
+        //     document.body.appendChild(documentDiv);
+        //   })
+        //   .catch(function(error) {
+        //     console.log(error);
+        //   });
       }
 
     if (fileList.length === 0) {
@@ -243,7 +306,20 @@ function DevPendingFileList(props) {
             const _document =  parser.parseFromString(documentXml, 'application/xml');
             console.log(_document.documentElement.textContent);
             console.log(_document.getElementsByTagName('w:body')[0].innerHTML);
-            setDocumentContent(_document.getElementsByTagName('w:body')[0].innerHTML);
+            const doc = new jsPDF();    
+            doc.html(_document.getElementsByTagName('w:body')[0].innerHTML, {
+                callback: () => {
+                    doc.save('document.pdf');
+                    const pdfBlob = doc.output('blob');
+                    const pdfUrl = URL.createObjectURL(pdfBlob);
+                    window.open(pdfUrl);
+                },
+                x: 10,
+                y: 10,
+                });
+               
+            //setDocumentContent(_document.getElementsByTagName('w:body')[0].innerHTML);
+            //setHtml(_document.getElementsByTagName('w:body')[0].innerHTML)
           })
           .catch(error => console.log(error));
       })
@@ -272,6 +348,10 @@ function DevPendingFileList(props) {
     // })
     // .catch(error => console.log(error));
   }
+
+  const renderHTML = () => {
+    return { __html: html };
+  };
 
     return (
         <>
@@ -324,9 +404,20 @@ function DevPendingFileList(props) {
                     </div>
                 </div>
             </div>
+            {html && (
+        <div
+          dangerouslySetInnerHTML={renderHTML()}
+          style={{ margin: '20px', border: '1px solid black', padding: '10px' }}
+        />
+      )}
             {<div dangerouslySetInnerHTML={{ __html: documentContent }}></div>}
-
-
+            {Docs.length>0 && <DocViewer documents={Docs} className="doc-viewer" config={{
+            header: {
+              disableHeader: false,
+              disableFileName: false,
+              retainURLParams: false,
+            },
+          }} pluginRenderers={DocViewerRenderers} />}
         <div className='row my-3'>
             
             {fileList.map(({ id, name, comment, reviewer_id }) => (
@@ -340,8 +431,8 @@ function DevPendingFileList(props) {
                                 <p className="card-text my-3">{comment}</p>
                                 <Link to="/" onClick={() => handleFileDownload(id,name)} className="btn btn-outline-primary mx-3">Download File</Link>
                                 <Link to="/" onClick={() => handleFileUpdate(id,name,comment)} className="btn btn-outline-primary d-none">Review</Link>
-                                {/* <Link to="/" onClick={() => handleFileView(name)} className="btn btn-outline-primary">View File</Link> */}
-                                <Link to="/" onClick={() => loadDocument(name)} className="btn btn-outline-primary">View File</Link>
+                                <Link to="/" onClick={() => handleFileView(name)} className="btn btn-outline-primary">View File</Link>
+                                {/* <Link to="/" onClick={() => loadDocument(name)} className="btn btn-outline-primary">View File</Link> */}
                             </div>
                             <div className="card-footer text-muted">
                                 Assigned to {reviewer_id}

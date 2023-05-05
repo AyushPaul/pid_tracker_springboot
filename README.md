@@ -20,7 +20,8 @@ The project has been implemented using the following technologies:
 
 ## Architecture Diagrams
 
-- ![](https://github.com/AyushPaul/Springboot-Microservices/blob/main/Architecture.png)
+![](https://github.com/AyushPaul/pid_tracker_springboot/blob/main/Picture1.png)
+!][](https://github.com/AyushPaul/pid_tracker_springboot/blob/main/Picture2.png)
 
 ## Project Structure
 The project is divided into several packages, each with a specific purpose:

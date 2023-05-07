@@ -129,6 +129,14 @@ https://user-images.githubusercontent.com/67481937/228021611-d4dc86e8-c212-42ff-
 
 https://user-images.githubusercontent.com/67481937/236659974-efd8fc9d-7295-4dec-9446-3816e9cdfcaf.mp4
 
+## Status Fetch
+
+
+
+
+https://user-images.githubusercontent.com/67481937/236660939-39bb4318-e4f3-49ca-b54b-37525da11470.mp4
+
+
 
 ## Conclusion
 This project has implemented several features that make it easy for users to upload and review PIDs. The use of Spring Security, JWT token, and Round Robin algorithm for review assignment ensures the security and efficiency of the application. The integration of Word View and the automatic reassignment of PIDs after deadline are also useful features that enhance the user experience.

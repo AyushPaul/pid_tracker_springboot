@@ -122,12 +122,21 @@ https://user-images.githubusercontent.com/67481937/227757328-943723bd-17cd-4cbc-
 
 https://user-images.githubusercontent.com/67481937/228021611-d4dc86e8-c212-42ff-ae1b-864d8ce0f309.mp4
 
-## File View ( Trial )
+## File View ( Blob Format )
 
 
 
 
 https://user-images.githubusercontent.com/67481937/236659974-efd8fc9d-7295-4dec-9446-3816e9cdfcaf.mp4
+
+
+## File View (Public Document)
+
+
+
+https://github.com/AyushPaul/pid_tracker_springboot/assets/67481937/62bce147-b493-4cda-af99-df7cdd04ce62
+
+
 
 ## Status Fetch
 
